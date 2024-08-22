@@ -64,6 +64,11 @@ fn main() {
     });
     audio_tag.set_year(YEAR);
 
+    let found_data = get_song_data(api_client, new_track_data.title);
+    let found_data = found_data.await?();
+
+    println!("{:?}", found_data);
+
     audio_tag.write_to_path(&args.file).unwrap();
     println!("The file has been tagged with the new data.");
 }

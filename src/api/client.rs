@@ -1,7 +1,7 @@
 use reqwest::header::{self, ACCEPT, USER_AGENT};
 
 use crate::constants::get_user_contact;
-pub fn build_api_client() -> reqwest::ClientBuilder {
+pub fn build_api_client() -> reqwest::Client {
     let client_contact: String = get_user_contact();
 
     let mut headers = header::HeaderMap::new();
@@ -14,7 +14,10 @@ pub fn build_api_client() -> reqwest::ClientBuilder {
             .expect("Error setting the user agent"),
     );
 
-    let api_client: reqwest::ClientBuilder = reqwest::Client::builder().default_headers(headers);
+    let api_client: reqwest::Client = reqwest::Client::builder()
+        .default_headers(headers)
+        .build()
+        .unwrap();
 
     api_client
 }
