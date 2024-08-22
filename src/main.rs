@@ -1,5 +1,7 @@
 use audiotags::{Album, Tag};
 use clap::Parser;
+use constants::generate_configuration;
+use owo_colors::OwoColorize;
 use reqwest::header::{self, ACCEPT};
 use serde::Deserialize;
 use std::fs;
@@ -15,8 +17,10 @@ use api::methods::*;
 #[command(version, about, long_about = None)]
 struct Frederick {
     #[arg(short, long)]
-    file: String,
+    file: Option<String>,
     //file: std::path::PathBuf,
+    #[arg(short, long, default_value = "false")]
+    generate_config_file: bool,
 }
 
 struct TrackData {
@@ -35,15 +39,26 @@ const ARTIST: &str = "Frederick";
 const ALBUM: &str = "Frederick's album";
 const YEAR: i32 = 1969;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let api_client = build_api_client();
 
     let args = Frederick::parse();
-    println!("Hello, chat. The file provided is: {:?}", &args.file);
-    let meta = fs::metadata(&args.file);
+
+    if args.generate_config_file {
+        generate_configuration().await.unwrap();
+        return;
+    }
+
+    let file = args
+        .file
+        .expect("No file provided. Use the --file flag to provide a flag.");
+
+    println!("Hello, chat. The file provided is: {:?}", &file);
+    let meta = fs::metadata(&file);
     println!("The file metada is {:?}", meta.unwrap());
 
-    let mut audio_tag = Tag::new().read_from_path(&args.file).unwrap();
+    let mut audio_tag = Tag::new().read_from_path(&file).unwrap();
 
     let current_track_title = audio_tag.title().unwrap();
 
@@ -65,10 +80,10 @@ fn main() {
     audio_tag.set_year(YEAR);
 
     let found_data = get_song_data(api_client, new_track_data.title);
-    let found_data = found_data.await?();
+    let found_data = found_data.await;
 
     println!("{:?}", found_data);
 
-    audio_tag.write_to_path(&args.file).unwrap();
+    audio_tag.write_to_path(&file).unwrap();
     println!("The file has been tagged with the new data.");
 }
