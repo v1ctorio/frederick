@@ -25,6 +25,7 @@
       ];
 
       shellHook = ''
+        alias fred ./target/debug/frederick
         echo "Rust 🦀 `${pkgs.rustc}/bin/rustc --version`"
       '';
     };

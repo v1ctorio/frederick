@@ -5,6 +5,7 @@ use owo_colors::OwoColorize;
 use reqwest::header::{self, ACCEPT};
 use serde::Deserialize;
 use std::fs;
+use toml::value::Array;
 use urlencoding::encode;
 
 mod constants;
@@ -13,6 +14,7 @@ mod api;
 use api::client::build_api_client;
 use api::methods::*;
 
+const supported_file_extensions: [&str; 3] = ["mp3", "flac", "m4a"];
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Frederick {
@@ -53,37 +55,41 @@ async fn main() {
     let file = args
         .file
         .expect("No file provided. Use the --file flag to provide a flag.");
+    let file = std::path::Path::new(&file);
 
-    println!("Hello, chat. The file provided is: {:?}", &file);
-    let meta = fs::metadata(&file);
-    println!("The file metada is {:?}", meta.unwrap());
+    let file_name = file.file_stem().expect("File to obtain file name").to_str().unwrap().to_string();
+    let file_extension = file.extension().expect("Failed to retrive file extension").to_str().unwrap();
 
-    let mut audio_tag = Tag::new().read_from_path(&file).unwrap();
+    println!("The file name is {:?}", file_name);
+    println!("The file extension is {:?}", file_extension);
 
-    let current_track_title = audio_tag.title().unwrap();
+    if !file.is_file()
+        || !supported_file_extensions.contains(&file.extension().unwrap().to_str().unwrap())
+    {
+        println!("{}", "The path provided is not valid.".red());
+        return;
+    }
 
-    let new_track_data: TrackData = TrackData {
-        title: find_song_name(current_track_title.to_string()),
-        artist: ARTIST.to_string(),
-        album: ALBUM.to_string(),
-        year: YEAR,
-        cover: None,
-    };
 
-    audio_tag.set_title(TITLE);
-    audio_tag.set_artist(ARTIST);
-    audio_tag.set_album(Album {
-        title: ALBUM,
-        artist: Some(ARTIST),
-        cover: None,
-    });
-    audio_tag.set_year(YEAR);
+    let found_data = get_song_data(
+        api_client,
+        file.file_stem().unwrap().to_str().unwrap().to_string(),
+    );
 
-    let found_data = get_song_data(api_client, new_track_data.title);
-    let found_data = found_data.await;
+    let found_data = found_data.await.unwrap();
 
-    println!("{:?}", found_data);
+    println!(
+        "The file extracted song name (from  filename) is {:?}",
+        &file
+    );
 
-    audio_tag.write_to_path(&file).unwrap();
-    println!("The file has been tagged with the new data.");
+    println!("The following data has been found {:?}", found_data);
+
+    let chosen_release = &found_data.releases.first().unwrap();
+
+    let mut new_tag = Tag::new().read_from_path(file).unwrap();
+    new_tag.set_title(&chosen_release.title);
+    new_tag.set_year(chosen_release.date.parse().unwrap());
+
+    //println!("The file has been tagged with the new data.");
 }

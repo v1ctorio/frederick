@@ -2,26 +2,26 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct MBZSearchResponse {
-    created: String,
-    count: u32,
+    pub created: String,
+    pub count: u32,
     offset: u32,
-    releases: Vec<MBZRelease>,
+    pub releases: Vec<MBZRelease>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct MBZRelease {
-    id: String,
-    score: String,
-    count: u32,
-    title: String,
+    pub id: String,
+    pub score: String,
+    pub count: u32,
+    pub title: String,
     #[serde(rename = "status-id")]
-    status_id: String,
-    status: String,
-    packaging: String,
+    pub status_id: String,
+    pub status: String,
+    pub packaging: String,
     #[serde(rename = "text-representation")]
-    text_representation: MBZTextRepresentation,
-    date: String,
-    country: String,
+    pub text_representation: MBZTextRepresentation,
+    pub date: String,
+    pub country: String,
 }
 
 #[derive(Debug, Deserialize)]

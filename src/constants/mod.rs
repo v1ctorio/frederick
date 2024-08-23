@@ -43,7 +43,7 @@ pub async fn generate_configuration() -> io::Result<()> {
 
     let config_str = format!(
         r#"
-        contact ={}
+contact ="{}"
     "#,
         input
     );
