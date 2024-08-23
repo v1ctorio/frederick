@@ -1,5 +1,5 @@
 use super::structs::MBZSearchResponse;
-use crate::BASE_BRAINZ_URL;
+use crate::{api::structs::MBZReleaseGroupResponse, BASE_BRAINZ_URL};
 
 pub async fn get_song_data(
     api_client: reqwest::Client,
@@ -18,6 +18,14 @@ pub fn find_song_name(track_name: String) -> String {
     let song_name = song_name.replace(" ", "+");
 
     song_name
+}
+
+pub async fn find_release_group(id: String) -> Result<(), Box<dyn std::error::Error>> {
+    let url = format!("{}/release-group/{}", BASE_BRAINZ_URL, id);
+    let response = reqwest::get(&url).await?;
+    let json = response.json::<MBZReleaseGroupResponse>().await?;
+    println!("{:?}", json);
+    Ok(())
 }
 
 // async fn download_album_cover(api_client: reqwest::Client, api_key: String, album: String, artist: String) -> Result<(), Box<dyn std::error::Error>> {
