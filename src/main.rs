@@ -4,6 +4,7 @@ use constants::generate_configuration;
 use owo_colors::OwoColorize;
 use reqwest::header::{self, ACCEPT};
 use serde::Deserialize;
+use tokio::io::{self, AsyncBufReadExt, AsyncWriteExt};
 use std::fs::File;
 use std::fs;
 use toml::value::Array;
@@ -76,24 +77,34 @@ async fn main() {
 
 
     let found_data = get_song_data(
-        api_client,
+        &api_client,
         song_name,
     );
 
-    let found_data = found_data.await.unwrap();
+    let mut found_data = found_data.await.unwrap();
 
     println!(
         "The file I'm going to edit is {:?}",
         &file.on_yellow()
     );
 
-    let mut file_handle = File::open(&file).unwrap();
 
 
     if (&found_data.releases).is_empty() {
         println!("{}","No data found for the release name provided.".red());
-        return;
+
+        let mut reader = io::BufReader::new(io::stdin());
+        let mut input = String::new();
+        println!("{}", "Write a release name to search: ".red());
+        reader.read_line(&mut input).await.unwrap();
+        let input = input.trim();
+
+        found_data = get_song_data(
+            &api_client,
+            input.to_string(),
+        ).await.unwrap();
     }
+    let mut file_handle = File::open(&file).unwrap();
 
 
     let chosen_release = &found_data.releases.first().unwrap();
@@ -103,6 +114,6 @@ async fn main() {
     new_tag.set_title(&chosen_release.title);
     new_tag.set_year(chosen_release.date.as_ref().unwrap()[0..4].parse().unwrap());
 
-    new_tag.write_to(&mut file_handle).unwrap();
+    new_tag.write_to(&mut file_handle).expect("Error writing to the file.");
     println!("The file has been tagged with the new data.");
 }

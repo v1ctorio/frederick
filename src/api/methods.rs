@@ -4,7 +4,7 @@ use super::structs::MBZSearchResponse;
 use crate::{api::structs::MBZReleaseGroupResponse, BASE_BRAINZ_URL};
 
 pub async fn get_song_data(
-    api_client: reqwest::Client,
+    api_client: &reqwest::Client,
     song: String,
 ) -> Result<MBZSearchResponse, Box<dyn std::error::Error>> {
     let song = urlencoding::encode(&song);

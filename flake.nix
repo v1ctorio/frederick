@@ -22,6 +22,8 @@
         
         pkg-config
         openssl
+
+        vhs
       ];
 
       shellHook = ''
