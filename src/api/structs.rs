@@ -4,7 +4,7 @@ use serde::Deserialize;
 pub struct MBZSearchResponse {
     pub created: String,
     pub count: u32,
-    offset: u32,
+    pub offset: u32,
     pub releases: Vec<MBZRelease>,
 }
 
