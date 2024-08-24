@@ -15,7 +15,7 @@ pub struct MBZRelease {
     pub count: u32,
     pub title: String,
     #[serde(rename = "status-id")]
-    pub status_id: String,
+    status_id: String,
     pub status: String,
     pub packaging: String,
     #[serde(rename = "text-representation")]

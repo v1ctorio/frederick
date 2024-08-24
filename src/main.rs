@@ -23,6 +23,8 @@ struct Frederick {
     //file: std::path::PathBuf,
     #[arg(short, long, default_value = "false")]
     generate_config_file: bool,
+    #[arg(short, long)]
+    release_name: Option<String>,
 }
 
 struct TrackData {
@@ -35,11 +37,7 @@ struct TrackData {
 
 pub const BASE_BRAINZ_URL: &str = "https://musicbrainz.org/ws/2";
 
-//TODO: retrive data from the last.fm API
-const TITLE: &str = "Hello chat";
-const ARTIST: &str = "Frederick";
-const ALBUM: &str = "Frederick's album";
-const YEAR: i32 = 1969;
+
 
 #[tokio::main]
 async fn main() {
@@ -57,10 +55,15 @@ async fn main() {
         .expect("No file provided. Use the --file flag to provide a flag.");
     let file = std::path::Path::new(&file);
 
-    let file_name = file.file_stem().expect("File to obtain file name").to_str().unwrap().to_string();
+
+    let mut song_name = file.file_stem().expect("File to obtain file name").to_str().unwrap().to_string();
     let file_extension = file.extension().expect("Failed to retrive file extension").to_str().unwrap();
 
-    println!("The file name is {:?}", file_name);
+    if let Some(n) = args.release_name {
+        song_name = n;
+    }
+
+    println!("The release name im searching for is {:?}", song_name);
     println!("The file extension is {:?}", file_extension);
 
     if !file.is_file()
@@ -73,7 +76,7 @@ async fn main() {
 
     let found_data = get_song_data(
         api_client,
-        file.file_stem().unwrap().to_str().unwrap().to_string(),
+        song_name,
     );
 
     let found_data = found_data.await.unwrap();
@@ -84,6 +87,11 @@ async fn main() {
     );
 
     println!("The following data has been found {:?}", found_data);
+
+    if (&found_data.releases).is_empty() {
+        println!("{}","No data found for the release name provided.".red());
+        return;
+    }
 
     let chosen_release = &found_data.releases.first().unwrap();
 

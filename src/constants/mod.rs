@@ -6,7 +6,7 @@ pub fn get_user_contact() -> String {
     let contact = std::env::var("MBRAINZ_CONTACT").unwrap_or_else(|_| {
         if let Some(config_dir) = config_dir() {
             println!(
-                "MBRAINZ_CONTACT NOW FOUND, trying to read from {}/frederickrs/config.toml",
+                "MBRAINZ_CONTACT successfully found, read from {}/frederickrs/config.toml",
                 config_dir.display()
             );
 
