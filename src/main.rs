@@ -4,6 +4,7 @@ use constants::generate_configuration;
 use owo_colors::OwoColorize;
 use reqwest::header::{self, ACCEPT};
 use serde::Deserialize;
+use std::fs::File;
 use std::fs;
 use toml::value::Array;
 use urlencoding::encode;
@@ -63,7 +64,7 @@ async fn main() {
         song_name = n;
     }
 
-    println!("The release name im searching for is {:?}", song_name);
+    println!("The release name im searching for is {:?}", song_name.on_blue());
     println!("The file extension is {:?}", file_extension);
 
     if !file.is_file()
@@ -82,22 +83,26 @@ async fn main() {
     let found_data = found_data.await.unwrap();
 
     println!(
-        "The file extracted release name is {:?}",
-        &file
+        "The file I'm going to edit is {:?}",
+        &file.on_yellow()
     );
 
-    println!("The following data has been found {:?}", found_data);
+    let mut file_handle = File::open(&file).unwrap();
+
 
     if (&found_data.releases).is_empty() {
         println!("{}","No data found for the release name provided.".red());
         return;
     }
 
+
     let chosen_release = &found_data.releases.first().unwrap();
+    println!("The following data has been found: title: {} year: {}, country: {}", &chosen_release.title.on_green(), &chosen_release.date.as_ref().unwrap().on_green(),&chosen_release.country.as_ref().unwrap().on_green());
 
     let mut new_tag = Tag::new().read_from_path(file).unwrap();
     new_tag.set_title(&chosen_release.title);
     new_tag.set_year(chosen_release.date.as_ref().unwrap()[0..4].parse().unwrap());
 
+    new_tag.write_to(&mut file_handle).unwrap();
     println!("The file has been tagged with the new data.");
 }

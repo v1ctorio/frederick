@@ -14,7 +14,6 @@ pub async fn get_song_data(
 
 
      let json = response.json::<MBZSearchResponse>().await?;
-     println!("{:?}", json);
 
     // let debugMBZSR = MBZSearchResponse {
     //     created: "2021-08-29T17:00:00Z".to_string(),
