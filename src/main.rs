@@ -83,21 +83,21 @@ async fn main() {
 
     println!(
         "The file extracted song name (from  filename) is {:?}",
-        &file
+        &found_data
     );
 
-    println!("The following data has been found {:?}", found_data);
+    // println!("The following data has been found {:?}", found_data);
 
-    if (&found_data.releases).is_empty() {
-        println!("{}","No data found for the release name provided.".red());
-        return;
-    }
+    // if (&found_data.releases).is_empty() {
+    //     println!("{}","No data found for the release name provided.".red());
+    //     return;
+    // }
 
-    let chosen_release = &found_data.releases.first().unwrap();
+    // let chosen_release = &found_data.releases.first().unwrap();
 
-    let mut new_tag = Tag::new().read_from_path(file).unwrap();
-    new_tag.set_title(&chosen_release.title);
-    new_tag.set_year(chosen_release.date.parse().unwrap());
+    // let mut new_tag = Tag::new().read_from_path(file).unwrap();
+    // new_tag.set_title(&chosen_release.title);
+    // new_tag.set_year(chosen_release.date.parse().unwrap());
 
     //println!("The file has been tagged with the new data.");
 }
