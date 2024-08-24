@@ -97,7 +97,7 @@ async fn main() {
 
     let mut new_tag = Tag::new().read_from_path(file).unwrap();
     new_tag.set_title(&chosen_release.title);
-    new_tag.set_year(chosen_release.date.parse().unwrap());
+    new_tag.set_year(chosen_release.date.as_ref().unwrap()[0..4].parse().unwrap());
 
     println!("The file has been tagged with the new data.");
 }

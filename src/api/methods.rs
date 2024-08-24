@@ -11,21 +11,19 @@ pub async fn get_song_data(
     let url = format!("{}/release/?query={}", BASE_BRAINZ_URL, song);
     let response = api_client.get(url).send().await?;
 
-    let cloned_response = response.borrow();
 
-    println!("{:?}", &response.text().await);
 
-    // let json = response.json::<MBZSearchResponse>().await?;
-    // println!("{:?}", json);
+     let json = response.json::<MBZSearchResponse>().await?;
+     println!("{:?}", json);
 
-    let debugMBZSR = MBZSearchResponse {
-        created: "2021-08-29T17:00:00Z".to_string(),
-        count: 1,
-        offset: 0,
-        releases: vec![],
-    };
-    //Ok(json)
-    Ok(debugMBZSR)
+    // let debugMBZSR = MBZSearchResponse {
+    //     created: "2021-08-29T17:00:00Z".to_string(),
+    //     count: 1,
+    //     offset: 0,
+    //     releases: vec![],
+    // };
+    Ok(json)
+    //Ok(debugMBZSR)
 }
 
 pub fn find_song_name(track_name: String) -> String {

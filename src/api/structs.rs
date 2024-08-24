@@ -11,23 +11,23 @@ pub struct MBZSearchResponse {
 #[derive(Debug, Deserialize)]
 pub struct MBZRelease {
     pub id: String,
-    pub score: String,
+    //pub score: u32,
     pub count: u32,
     pub title: String,
-    #[serde(rename = "status-id")]
-    status_id: String,
-    pub status: String,
-    pub packaging: String,
-    #[serde(rename = "text-representation")]
-    pub text_representation: MBZTextRepresentation,
-    pub date: String,
-    pub country: String,
+    //#[serde(rename = "status-id")]
+    //pub status_id: Option<String>,
+    //pub status: String,
+    //pub packaging: String,
+    //#[serde(rename = "text-representation")]
+    //pub text_representation: MBZTextRepresentation,
+    pub date: Option<String>,
+    pub country: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct MBZTextRepresentation {
-    language: String,
-    script: String,
+    language: Option<String>,
+    script: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
