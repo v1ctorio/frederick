@@ -5,7 +5,7 @@ use owo_colors::OwoColorize;
 use reqwest::header::{self, ACCEPT};
 use serde::Deserialize;
 use std::fs;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use tokio::io::{self, AsyncBufReadExt, AsyncWriteExt};
 use toml::value::Array;
 use urlencoding::encode;
@@ -101,27 +101,32 @@ async fn main() {
 
         found_data = get_song_data(&api_client, input.to_string()).await.unwrap();
     }
-    let mut file_handle = File::open(&file).unwrap();
+    let mut file_handle = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(&file)
+        .unwrap();
 
     let chosen_release = &found_data.releases.first().unwrap();
-    
-    
+
     let chosen_title = &chosen_release.title;
     let chosen_date: i32 = chosen_release.date.as_ref().unwrap()[0..4].parse().unwrap();
 
-
-    let mut new_tag = Tag::new().read_from_path(file).unwrap();
-    new_tag.set_title(chosen_title);
-    new_tag.set_year(chosen_date);
-
-    new_tag
-        .write_to(&mut file_handle)
-        .expect("Error writing to the file.");
-    println!("The file has been tagged with the new data.");
     println!(
         "The following data has been found: title: {} year: {}, country: {}",
         chosen_title,
         chosen_date,
         &chosen_release.country.as_ref().unwrap().on_green()
     );
+
+    let mut new_tag = Tag::new().read_from_path(file).unwrap();
+    new_tag.set_title(&chosen_title);
+    new_tag.set_year(chosen_date);
+
+    new_tag
+        .write_to(&mut file_handle)
+        .expect("Error writing to the file.");
+
+    println!("The file has been tagged with the new data.");
+
 }
